@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { asyncFetcher } from '../asyncFetcher'; // Assuming asyncFetcher is in src
+import { asyncFetcher } from '../asyncFetcher'; 
 
 const TextAnalyzer = () => {
   const [text, setText] = useState('The quick brown fox jumps over the lazy dog the fox');

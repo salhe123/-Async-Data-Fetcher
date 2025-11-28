@@ -34,4 +34,5 @@ async function asyncFetcher(url, maxRetries = 3, retryDelayMs = 1000) {
   }
 }
 
-module.exports = { asyncFetcher, mockApiCall };
+// Export the functions for testing and later integration
+export { asyncFetcher, mockApiCall };

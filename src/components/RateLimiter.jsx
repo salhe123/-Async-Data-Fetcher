@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { asyncFetcher } from '../asyncFetcher'; // Assuming asyncFetcher is in src
+import { asyncFetcher } from '../asyncFetcher'; 
 
 const RateLimiter = () => {
   const [userId, setUserId] = useState('user123');
@@ -8,15 +8,16 @@ const RateLimiter = () => {
 
   const handleRequest = async () => {
     setIsLoading(true);
-    const backendUrl = 'http://localhost:8081/api/resource'; // URL for the Go backend
+    const backendUrl = 'http://localhost:8081/api/resource'; 
     const startTime = new Date();
 
-    try {
+    const fetchData = async () => {
       const response = await fetch(backendUrl, {
         headers: {
           'X-User-ID': userId,
         },
       });
+      
       const data = await response.json();
       
       const newResponse = {
@@ -25,12 +26,21 @@ const RateLimiter = () => {
         body: JSON.stringify(data),
         success: response.ok,
       };
-      setResponses(prev => [newResponse, ...prev]);
 
+      if (!response.ok) {
+        throw new Error(`Status ${response.status}`); 
+      }
+      
+      return newResponse;
+    };
+
+    try {
+      const result = await asyncFetcher(fetchData, 2, 500); 
+      setResponses(prev => [result, ...prev]);
     } catch (err) {
       const newResponse = {
         time: startTime.toLocaleTimeString(),
-        status: 'Network Error',
+        status: 'Network Error / Retries Failed',
         body: err.message,
         success: false,
       };
@@ -43,6 +53,7 @@ const RateLimiter = () => {
   return (
     <div className="card">
       <h2>Task 3: Rate Limiter Tester (Go Backend)</h2>
+      <p><i>(Uses asyncFetcher for retries on API calls. It will retry twice on failure.)</i></p>
       <div>
         <label htmlFor="userId">User ID: </label>
         <input
